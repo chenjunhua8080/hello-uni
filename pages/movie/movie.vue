@@ -2,7 +2,7 @@
 	<view class="movie-main">
 		<view class="movie-body">
 			<view class="movie-body-left">
-				<image :src="movie.img" mode="aspectFit"></image>
+				<image :src="movie.img" mode="aspectFit" class="movie-img"></image>
 			</view>
 			<view class="movie-body-right">
 				<view class="movie-title">{{movie.name}}</view>
@@ -13,7 +13,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="movie-score">豆瓣评分: {{movie.score}}</view>
+		<view class="movie-score">
+			<view class="movie-score-title">豆瓣评分</view>
+			<view class="movie-score-value">{{movie.score}}</view>
+		</view>
 		<view class="movie-desc">
 			<view class="movie-desc-title">剧情简介</view>
 			<view class="movie-desc-value">{{desc}}</view>
@@ -125,10 +128,70 @@
 		position: relative;
 		margin-bottom: 10px;
 	}
+
 	.movie-body-left {
 		display: inline-block;
 	}
-	.movie-body-right{
+
+	.movie-img {
+		width: 200px;
+	}
+
+	.movie-body-right {
+		width: 150px;
+		position: absolute;
+		top: 50%;
+		margin-left: 210px;
+		margin-top: -75px;
+	}
+
+	.movie-title {
+		font-size: 32px;
+		margin-bottom: 10px;
+	}
+
+	.movie-actors {
+		color: #8F8F94;
+		font-size: 14px;
+		margin-bottom: 10px;
+	}
+
+	.movie-up,
+	.movie-down {
 		display: inline-block;
+		width: 50px;
+		color: red;
+		text-align: center;
+		margin: 5px;
+	}
+	
+	.movie-score-title{
+		display: inline-block;
+	}
+	.movie-score-value{
+		display: inline-block;
+		margin: 10px;
+		font-size: 32px;
+	}
+	
+	.movie-desc-title{
+		margin: 10px 0px;
+	}
+	
+	.movie-desc-value{
+		color: #8F8F94;
+	}
+	
+	.movie-comments{
+		margin: 10px 0px;
+	}
+	.movie-comments-item{
+		margin: 10px 0px;
+		color: #8F8F94;
+	}
+
+	* {
+/* 		border: solid 1px #007AFF; */
+		box-shadow: #8F8F94 5px 5px 5px;
 	}
 </style>
