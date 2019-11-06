@@ -23,10 +23,11 @@
 		</view>
 		<view class="movie-comments">
 			<view class="movie-comments-title">评论区</view>
-			<view class="movie-comments-item" v-for="item in comments" :key="item.id">
+			<view class="movie-comments-item" v-for="item in comments.data" :key="item.id">
 				{{item}}
 			</view>
 		</view>
+		<button @tap="toTop" class="to-top">回到顶部</button>
 	</view>
 </template>
 
@@ -45,7 +46,99 @@
 					comments: []
 				},
 				desc: '',
-				comments: [],
+				comments: {
+					pageNum: 1,
+					pageSize: 20,
+					data: []
+				},
+			}
+		},
+		methods: {
+			getMovie() {
+				const that = this;
+				//获取电影
+				uni.request({
+					url: 'http://h5.springeasy.cn/mp/cloud/getNowPlaying',
+					success(res) {
+						console.log(res);
+						if (res.data.code == 200) {
+							that.movie = res.data.data;
+							console.log("this.movie：" + that.movie);
+							//获取详情
+							that.getDesc();
+							//获取评论
+							that.getComments(1);
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: res.data.msg
+							})
+						}
+					}
+				});
+			},
+			//获取描述
+			getDesc() {
+				const that = this;
+				uni.request({
+					url: 'http://h5.springeasy.cn/mp/cloud/getMovieDesc',
+					data: {
+						movieId: that.movie.id
+					},
+					success(res) {
+						console.log(res);
+						if (res.data.code == 200) {
+							that.desc = res.data.data;
+							console.log("this.desc: " + that.desc);
+						} else {
+							uni.showToast({
+								icon: 'none',
+								title: res.data.msg
+							})
+						}
+					}
+				});
+			},
+			//获取评论
+			getComments(pageNum) {
+				const that = this;
+				console.log('pageNum: ' + pageNum);
+				if (pageNum != 1) {
+					uni.showLoading({
+						title: '正在加载'
+					})
+				}
+				uni.request({
+					url: 'http://h5.springeasy.cn/mp/cloud/getComments',
+					data: {
+						movieId: that.movie.id,
+						pageNum: pageNum,
+						pageSize: 20
+					},
+					success(res) {
+						console.log(res);
+						if (res.data.code == 200) {
+							that.comments.data.push(res.data.data);
+							that.comments.pageNum = pageNum;
+							console.log("this.comments: " + that.comments);
+						} else {
+							uni.hideLoading();
+							uni.showToast({
+								icon: 'none',
+								title: res.data.msg
+							})
+						}
+					},
+					complete() {
+						uni.hideLoading();
+					}
+				});
+			},
+			toTop() {
+				uni.pageScrollTo({
+					scrollTop: 0,
+					duration: 300
+				});
 			}
 		},
 		onLoad() {
@@ -55,70 +148,20 @@
 			oMeta.content = "no-referrer"
 			document.getElementsByTagName('head')[0].appendChild(oMeta);
 			console.log("set meta: " + oMeta);
-
-			const that = this;
 			//获取电影
-			uni.request({
-				url: 'http://h5.springeasy.cn/mp/cloud/getNowPlaying',
-				success(res) {
-					console.log(res);
-					if (res.data.code == 200) {
-						that.movie = res.data.data;
-						console.log("this.movie：" + that.movie);
-						//获取描述
-						uni.request({
-							url: 'http://h5.springeasy.cn/mp/cloud/getMovieDesc',
-							data: {
-								movieId: that.movie.id
-							},
-							success(res) {
-								console.log(res);
-								if (res.data.code == 200) {
-									that.desc = res.data.data;
-									console.log("this.desc: " + that.desc);
-								} else {
-									uni.showToast({
-										icon: 'none',
-										title: res.data.msg
-									})
-								}
-							}
-						});
-						//获取评论
-						uni.request({
-							url: 'http://h5.springeasy.cn/mp/cloud/getComments',
-							data: {
-								movieId: that.movie.id,
-								pageNum: 1,
-								pageSize: 20
-							},
-							success(res) {
-								console.log(res);
-								if (res.data.code == 200) {
-									that.comments = res.data.data;
-									console.log("this.comments: " + that.comments);
-								} else {
-									uni.showToast({
-										icon: 'none',
-										title: res.data.msg
-									})
-								}
-							}
-						});
-					} else {
-						uni.showToast({
-							icon: 'none',
-							title: res.data.msg
-						})
-					}
-				}
-			});
+			this.getMovie();
 		},
 		onPullDownRefresh() {
 			console.log('refresh');
+			//获取电影
+			this.getMovie();
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 1000);
+		},
+		onReachBottom() {
+			//获取更多评论
+			this.getComments(this.comments.pageNum + 1);
 		}
 	}
 </script>
@@ -135,6 +178,8 @@
 
 	.movie-img {
 		width: 200px;
+		margin-top: 20px;
+		/* box-shadow: #8F8F94 5px 5px 5px; */
 	}
 
 	.movie-body-right {
@@ -148,12 +193,14 @@
 	.movie-title {
 		font-size: 32px;
 		margin-bottom: 10px;
+		box-shadow: #8F8F94 5px 5px 5px;
 	}
 
 	.movie-actors {
 		color: #8F8F94;
 		font-size: 14px;
 		margin-bottom: 10px;
+		box-shadow: #8F8F94 5px 5px 5px;
 	}
 
 	.movie-up,
@@ -163,35 +210,62 @@
 		color: red;
 		text-align: center;
 		margin: 5px;
+		box-shadow: #8F8F94 5px 5px 5px;
 	}
-	
-	.movie-score-title{
+
+	.movie-score-title {
+		margin: 20px 0px;
+		font-size: 24px;
 		display: inline-block;
+		box-shadow: #0FAEFF 5px 5px 5px;
 	}
-	.movie-score-value{
+
+	.movie-score-value {
 		display: inline-block;
 		margin: 10px;
-		font-size: 32px;
+		font-size: 36px;
+		box-shadow: #0FAEFF 5px 5px 5px;
 	}
-	
-	.movie-desc-title{
-		margin: 10px 0px;
+
+	.movie-desc-title {
+		font-size: 24px;
+		margin: 20px 0px;
+		box-shadow: #0FAEFF 5px 5px 5px;
 	}
-	
-	.movie-desc-value{
-		color: #8F8F94;
-	}
-	
-	.movie-comments{
-		margin: 10px 0px;
-	}
-	.movie-comments-item{
-		margin: 10px 0px;
+
+	.movie-desc-value {
 		color: #8F8F94;
 	}
 
-	* {
-/* 		border: solid 1px #007AFF; */
+	.movie-comments {
+		margin: 20px 0px;
+	}
+
+	.movie-comments-title {
+		font-size: 24px;
+		box-shadow: #0FAEFF 5px 5px 5px;
+	}
+
+	.movie-comments-item {
+		margin: 20px 0px;
+		color: #8F8F94;
 		box-shadow: #8F8F94 5px 5px 5px;
+	}
+
+	.to-top {
+		text-align: center;
+		position: fixed;
+		right: 20px;
+		bottom:70px;
+		z-index: 999;
+		opacity: 0.7;
+	}
+	.to-top:hover{
+		opacity: 1;
+	}
+
+	* {
+		/* 		border: solid 1px #007AFF; */
+		/* box-shadow: #8F8F94 5px 5px 5px; */
 	}
 </style>

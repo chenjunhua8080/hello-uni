@@ -30,7 +30,8 @@
 			"path": "pages/movie/movie",
 			"style": {
 				"navigationBarTitleText": "电影推荐",
-				"enablePullDownRefresh": true //下拉刷新
+				"enablePullDownRefresh": true, //下拉刷新
+				"onReachBottomDistance": 100 //上拉刷新
 			}
 		}
 	],
