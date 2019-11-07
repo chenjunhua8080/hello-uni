@@ -58,7 +58,7 @@
 				const that = this;
 				//获取电影
 				uni.request({
-					url: 'http://h5.springeasy.cn/mp/cloud/getNowPlaying',
+					url: 'http://wechat-mp.springeasy.cn/cloud/getNowPlaying',
 					success(res) {
 						console.log(res);
 						if (res.data.code == 200) {
@@ -81,7 +81,7 @@
 			getDesc() {
 				const that = this;
 				uni.request({
-					url: 'http://h5.springeasy.cn/mp/cloud/getMovieDesc',
+					url: 'http://wechat-mp.springeasy.cn/cloud/getMovieDesc',
 					data: {
 						movieId: that.movie.id
 					},
@@ -109,7 +109,7 @@
 					})
 				}
 				uni.request({
-					url: 'http://h5.springeasy.cn/mp/cloud/getComments',
+					url: 'http://wechat-mp.springeasy.cn/cloud/getComments',
 					data: {
 						movieId: that.movie.id,
 						pageNum: pageNum,
