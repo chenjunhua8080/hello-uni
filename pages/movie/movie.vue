@@ -58,7 +58,7 @@
 				const that = this;
 				//获取电影
 				uni.request({
-					url: 'http://wechat-mp.springeasy.cn/cloud/getNowPlaying',
+					url: 'http://h5.springeasy.cn/mp/cloud/getNowPlaying',
 					success(res) {
 						console.log(res);
 						if (res.data.code == 200) {
@@ -81,7 +81,7 @@
 			getDesc() {
 				const that = this;
 				uni.request({
-					url: 'http://wechat-mp.springeasy.cn/cloud/getMovieDesc',
+					url: 'http://h5.springeasy.cn/mp/cloud/getMovieDesc',
 					data: {
 						movieId: that.movie.id
 					},
@@ -109,7 +109,7 @@
 					})
 				}
 				uni.request({
-					url: 'http://wechat-mp.springeasy.cn/cloud/getComments',
+					url: 'http://h5.springeasy.cn/mp/cloud/getComments',
 					data: {
 						movieId: that.movie.id,
 						pageNum: pageNum,
@@ -118,7 +118,13 @@
 					success(res) {
 						console.log(res);
 						if (res.data.code == 200) {
-							that.comments.data.push(res.data.data);
+							if (res.data.data.length > 0) {
+								if (pageNum == 1) {
+									that.comments.data = res.data.data;
+								} else {
+									that.comments.data.push(res.data.data);
+								}
+							}
 							that.comments.pageNum = pageNum;
 							console.log("this.comments: " + that.comments);
 						} else {
@@ -256,11 +262,12 @@
 		text-align: center;
 		position: fixed;
 		right: 20px;
-		bottom:70px;
+		bottom: 70px;
 		z-index: 999;
 		opacity: 0.7;
 	}
-	.to-top:hover{
+
+	.to-top:hover {
 		opacity: 1;
 	}
 
